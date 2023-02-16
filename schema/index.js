@@ -8,7 +8,7 @@ type Query{
     getUserEvents(userId:ID) : Event
 }
 type Mutation{
-    createUser(userInput:UserInput): User
+    createUser(userInput:UserInput): AuthData
     createEvent(eventInput:EventInput) : Event
     bookEvent(eventId:ID) : [Event]
     login(email:String,password:String) : AuthData
