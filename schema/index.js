@@ -4,13 +4,14 @@ const typeDefs = gql`
 
 type Query{
     events:[Event]
-    bookings:[Booking]
+    bookings: [Booking]
     getUserEvents(userId:ID) : [Event]
 }
 type Mutation{
     createUser(userInput:UserInput): AuthData
     createEvent(eventInput:EventInput) : Event
-    bookEvent(eventId:ID) : [Event]
+    bookEvent(eventId:ID) : Booking
+    cancelBooking(bookingId:ID) : Event
     login(email:String,password:String) : AuthData
     deleteEvent(eventId:ID) : [Event]
 
