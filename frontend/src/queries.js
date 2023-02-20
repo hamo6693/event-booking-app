@@ -9,6 +9,10 @@ query Events{
         description
         price
         date
+        creator{
+            _id
+            username
+        }
     }
 }
 `
@@ -31,4 +35,13 @@ mutation CreateUser($username:String,$email:String,$password:String) {
     }
 }
 
+`
+export const BOOK_EVENT = gql`
+mutation BookEvent ($eventId:ID) {
+    bookEvent(eventId: $eventId) {
+        _id
+        createdAt
+        updatedAt
+    }
+}
 `
