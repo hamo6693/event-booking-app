@@ -3,16 +3,19 @@ import React ,{useContext, useEffect, useState} from "react";
 import { LOGIN } from "../queries";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/auth-context";
+import Error from "../components/Error";
 
 export default function LoginPage() {
     const value = useContext(AuthContext)
+    const [alert,setAlert] = useState("")
+
 
     function Login() {
         const [email,setEmail] = useState("")
         const [password,setPassword] = useState("")
         const navigate = useNavigate()
-        const [login,{loading,error,data}] = useMutation(LOGIN,{
-            onCompleted:console.log("تم التسجيل بنجاح")
+        const [login,{loading,data}] = useMutation(LOGIN,{
+            onError:(error) => setAlert(error.message)
         })
         useEffect(() => {
             if(!loading && data) {
@@ -23,7 +26,6 @@ export default function LoginPage() {
             }
         },[data,loading])
         if(loading) return <p>Loading...</p>;
-        if(error) return error.message
         if(data) {
             console.log(data.login.token);
         }
@@ -36,6 +38,7 @@ export default function LoginPage() {
                 variables: {email: email.trim(), password: password.trim()}
             })
         }}>
+                <Error error ={alert} />
                 <div className="mb-3 mt-2">
                 <label className="form-label" htmlFor="email">االبريد الاكتروني</label>
                 <input value={email}

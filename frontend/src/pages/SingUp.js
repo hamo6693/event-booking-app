@@ -2,16 +2,20 @@ import { useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { CREATE_USER } from "../queries";
 import AuthContext from "../context/auth-context";
+import Error from "../components/Error";
 
 export default function SingUpPage() {
+const [alert,setAlert] = useState("")
+
   const value = useContext(AuthContext)
 
   function SingUp() {
     const [username,setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [singup, { loading, error, data }] = useMutation(CREATE_USER, {
-      onCompleted:() => console.log("تم  انشاء التسجيل بنجاح")
+    const [singup, { loading, data }] = useMutation(CREATE_USER, {
+      onError:(error) => setAlert(error.message),
+      onCompleted:() => setAlert("تم  انشاء التسجيل بنجاح")
     })
     useEffect(() => {
       if(!loading && data) {
@@ -22,11 +26,8 @@ export default function SingUpPage() {
       }
   },[data,loading])
     if (loading) return <p>Loading...</p>;
-    if (error) return error.message
-    if (data) {
-      console.log(data.createUser.token);
-    }
-
+    
+    
     return (
       <form
         className="auth-form"
@@ -40,6 +41,7 @@ export default function SingUpPage() {
           });
         }}
       >
+        <Error error={alert} />
         <div className="mb-3 mt-2">
           <label className="form-label" htmlFor="username">
             اسم المستخدم

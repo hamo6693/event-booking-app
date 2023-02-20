@@ -45,3 +45,15 @@ mutation BookEvent ($eventId:ID) {
     }
 }
 `
+export const CREATE_EVENT = gql`
+mutation CreateEvent($title:String,$description:String,$price:String,$date:String){
+    createEvent(eventInput:{title:$title,description:$description,price:$price,date:$date}){
+        _id
+        title
+        description
+        date
+        price
+    }
+}
+
+`
