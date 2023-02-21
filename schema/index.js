@@ -58,5 +58,9 @@ type Booking{
     updatedAt:String
 }
 
-` 
+
+type Subscription{
+    eventAdded:Event
+}
+`
 module.exports = {typeDefs}

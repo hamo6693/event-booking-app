@@ -15,7 +15,7 @@ export default function SimpleModel({title,children,onConfirm,onCancel,confirmTe
           <Button variant="primary" onClick={onConfirm} disabled={isDisabled}>
             {confirmText}
           </Button>
-          <Button className='mx-2' variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             اغلاق
           </Button>
         </Modal.Footer>

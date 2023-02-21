@@ -3,7 +3,8 @@ const {transformEvent,transformBooking} = require("./transform")
 const {UserInputError} = require("apollo-server-express")
 const {combineResolvers} = require("graphql-resolvers")
 const {isLoggedIn} = require("../middlewares/isLogin")
-
+const {PubSub} = require("graphql-subscriptions")
+const pubsub = new PubSub()
 const eventResolver = {
     Query:{
         events:async() => {
@@ -38,8 +39,13 @@ const eventResolver = {
                 price:args.eventInput.price,
                 creator:context.user._id
             })
+            let createdEvent 
             try{
-                await event.save()
+                const result = await event.save()
+                createdEvent = transformEvent(result)
+                pubsub.publish("EVENT_ADDED",{
+                    eventAdded:createdEvent
+                })
                 return transformEvent(event)
             } catch(err) {
                 throw err
@@ -54,7 +60,13 @@ const eventResolver = {
             }
         },
         
+    },
+    Subscription:{
+        eventAdded:{
+            subscribe:() => pubsub.asyncIterator("EVENT_ADDED")
+        }
     }
+
 }
 
 module.exports = {eventResolver}

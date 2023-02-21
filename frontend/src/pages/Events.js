@@ -1,11 +1,12 @@
-import { useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery, useSubscription } from "@apollo/client";
 import React, { useContext, useState } from "react";
-import { EVENTS,BOOK_EVENT,CREATE_EVENT } from "../queries";
+import { EVENTS,BOOK_EVENT,CREATE_EVENT,EVENT_ADDED } from "../queries";
 import {NavLink} from "react-router-dom";
 import EventItem from "../components/Eventitem";
 import SimpleModel from "../components/SimpleModel";
 import AuthContext from "../context/auth-context";
 import Error from "../components/Error";
+import Spinner from "../components/Spinner";
 
 
 export default function EventsPage() {
@@ -19,22 +20,36 @@ export default function EventsPage() {
     const [date, setDate] = useState("")
     const [description, setDescription] = useState("")
     const client = useApolloClient()
+    useSubscription(EVENT_ADDED,{
+        onSubscriptionData:async({subscriptionData}) => {
+            if(subscriptionData.data) {
+                const addedEvent = subscriptionData.data.eventAdded
+                setAlert(`اضافة جديدة بعنوان${addedEvent.title}اضيفة للتو`)
+            }
+            if(subscriptionData.error) {
+                setAlert("فشل جلب المناسبات الجديدة")
+            }
+        }
+    })
 
 
     function EventList() {
 
         const { loading,error,data } = useQuery(EVENTS)
         
-        if(loading) return <p>Loading...</p>;
+        if(loading) return <Spinner />
         if(error) {
             setAlert(error.message)
             return;
         }
+        client.refetchQueries({
+            include:["Events"]
+        })
         const showDetailHandler = eventId => {
             const clickedEvent = data.events.find(event => event._id === eventId)
-
             setSelectedEvent(clickedEvent)
     }
+    
     return(
             <div className="container-fluid">
                 <div className="row justify-content-center">
@@ -78,6 +93,9 @@ export default function EventsPage() {
             })
         }
     }) 
+    if(createEventLoading) {
+        return <Spinner />
+    }
 
     return(
         <div>

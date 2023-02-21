@@ -3,6 +3,7 @@ import { gql } from "@apollo/client"
 export const EVENTS = gql` 
 
 query Events{
+    
     events{
         _id
         title
@@ -56,4 +57,40 @@ mutation CreateEvent($title:String,$description:String,$price:String,$date:Strin
     }
 }
 
+`
+
+export const BOOKINGS = gql`
+query Bookings {
+    bookings{
+        _id
+        createdAt
+        event{
+            _id
+            title
+            description
+            date
+            price
+        }
+    }
+}
+
+`
+export const CANCEL_BOOKING = gql`
+mutation CancelBooking($bookingId:ID){
+    cancelBooking(bookingId:$bookingId) {
+        _id
+        title
+    }
+}
+`
+export const EVENT_ADDED = gql`
+subscription{
+    eventAdded{
+        _id
+        title
+        price
+        description
+        date
+    }
+}
 `

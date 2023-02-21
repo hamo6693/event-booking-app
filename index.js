@@ -8,7 +8,9 @@ require("dotenv").config()
 const mongoose = require("mongoose")
 const User = require("./models/user")
 const jwt = require("jsonwebtoken")
-
+const {makeExecutableSchema} = require("@graphql-tools/schema")
+const {WebSocketServer} = require("ws")
+const {useServer} = require("graphql-ws/lib/use/ws")
 
 async function StartApolloServer(typeDefs,resolvers){
     const app = express()
@@ -17,11 +19,29 @@ async function StartApolloServer(typeDefs,resolvers){
         res.setHeader("Access-Control-Allow-Origin",process.env.APP_URL)
         next()
     })
-
-    const server = new ApolloServer({
+    const schema = makeExecutableSchema({
         typeDefs,
-        resolvers,
-        plugins:[ApolloServerPluginDrainHttpServer({httpServer})],
+        resolvers
+    })
+    const wsServer = new WebSocketServer({
+        server:httpServer,
+        path:"/graphql"
+    })
+    const serverCleanup = useServer({schema},wsServer)
+    const server = new ApolloServer({
+        schema,
+        plugins:[
+            ApolloServerPluginDrainHttpServer({httpServer}),
+            {
+                async serverWillStart() {
+                    return{
+                        async drainServer() {
+                            serverCleanup.dispose()
+                        }
+                    }
+                }
+            }
+        ],
         context: async({req}) => {
             const auth = req ? req.headers.authorization : null
             if(auth) {

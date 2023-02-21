@@ -4,6 +4,7 @@ import { LOGIN } from "../queries";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/auth-context";
 import Error from "../components/Error";
+import Spinner from "../components/Spinner";
 
 export default function LoginPage() {
     const value = useContext(AuthContext)
@@ -25,7 +26,7 @@ export default function LoginPage() {
                 value.login(token,userId,username)
             }
         },[data,loading])
-        if(loading) return <p>Loading...</p>;
+        if(loading) return <Spinner />;
         if(data) {
             console.log(data.login.token);
         }
